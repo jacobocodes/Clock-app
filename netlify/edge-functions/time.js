@@ -15,27 +15,33 @@ export default (request, context) => {
   const tz =
     url.searchParams.get("tz") || context.geo?.timezone || "UTC";
 
-  let timeString;
-  try {
-    timeString = new Intl.DateTimeFormat("en-US", {
-      timeZone: tz,
+  const format = (zone) => {
+    const now = new Date();
+    const date = new Intl.DateTimeFormat("en-US", {
+      timeZone: zone,
+      month: "numeric",
+      day: "numeric",
+      year: "numeric",
+    }).format(now);
+    const time = new Intl.DateTimeFormat("en-US", {
+      timeZone: zone,
       hour: "numeric",
       minute: "2-digit",
       second: "2-digit",
       hour12: true,
-    }).format(new Date());
+    }).format(now);
+    return `${date} - ${time}`;
+  };
+
+  let output;
+  try {
+    output = format(tz);
   } catch (e) {
     // Invalid timezone string — fall back to UTC.
-    timeString = new Intl.DateTimeFormat("en-US", {
-      timeZone: "UTC",
-      hour: "numeric",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    }).format(new Date());
+    output = format("UTC");
   }
 
-  return new Response(timeString, {
+  return new Response(output, {
     headers: {
       "content-type": "text/plain; charset=utf-8",
       "cache-control": "no-store",
