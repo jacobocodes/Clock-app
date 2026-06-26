@@ -19,6 +19,7 @@ export default (request, context) => {
     const now = new Date();
     const date = new Intl.DateTimeFormat("en-US", {
       timeZone: zone,
+      weekday: "long",
       month: "numeric",
       day: "numeric",
       year: "numeric",
